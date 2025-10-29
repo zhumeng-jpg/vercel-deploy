@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人金额查询系统</title>
+    <style>
+        body { 
+            font-family: 'Microsoft YaHei', sans-serif; 
+            max-width: 450px; 
+            margin: 50px auto; 
+            padding: 20px; 
+            background-color: #f5f5f5;
+        }
+        .container { 
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center; 
+        }
+        h2 { 
+            color: #333; 
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin: 15px 0;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: bold;
+        }
+        input { 
+            padding: 12px; 
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        button { 
+            padding: 12px 30px; 
+            margin: 20px 0 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result { 
+            margin-top: 25px; 
+            padding: 20px; 
+            border-radius: 5px; 
+            font-size: 1.1em; 
+            text-align: center;
+        }
+        .success { 
+            background-color: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
+        }
+        .error { 
+            background-color: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .hidden {
+            display: none;
+        }
+        .password-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔐 个人金额查询系统</h2>
+        <p>请输入您的姓名和密码进行查询：</p>
+        
+        <div class="input-group">
+            <label for="nameInput">姓名：</label>
+            <input type="text" id="nameInput" placeholder="请输入您的姓名" autocomplete="off">
+        </div>
+
+        <div class="input-group password-input" id="passwordGroup">
+            <label for="passwordInput">密码：</label>
+            <input type="password" id="passwordInput" placeholder="请输入您的密码" autocomplete="off">
+        </div>
+
+        <button onclick="handleSearch()">查询</button>
+        
+        <div id="result" class="hidden"></div>
+    </div>
+
+    <script>
+        // 用户数据：姓名、密码、金额
+        const userData = {
+            "张三": { password: "111", amount: "5,000" },
+            "李四": { password: "222", amount: "3,200" },
+            "王五": { password: "333", amount: "8,800" }
+        };
+
+        // 显示/隐藏密码输入框
+        document.getElementById('nameInput').addEventListener('input', function() {
+            const name = this.value.trim();
+            const passwordGroup = document.getElementById('passwordGroup');
+            const passwordInput = document.getElementById('passwordInput');
+            
+            if (userData.hasOwnProperty(name)) {
+                passwordGroup.style.display = 'block';
+                passwordInput.value = ''; // 清空密码框
+            } else {
+                passwordGroup.style.display = 'none';
+                passwordInput.value = '';
+            }
+        });
+
+        function handleSearch() {
+            const name = document.getElementById('nameInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            // 隐藏结果框
+            resultDiv.classList.add('hidden');
+            
+            // 验证输入
+            if (!name) {
+                showResult("请输入姓名。", "error");
+                return;
+            }
+
+            if (!userData.hasOwnProperty(name)) {
+                showResult(`未找到姓名 "<strong>${name}</strong>" 对应的记录，请检查姓名是否正确。`, "error");
+                return;
+            }
+
+            if (!password) {
+                showResult("请输入密码。", "error");
+                return;
+            }
+
+            // 验证密码
+            if (password === userData[name].password) {
+                showResult(`尊敬的 <strong>${name}</strong>，您的金额为：<strong style="font-size:1.3em;">${userData[name].amount}</strong> 元。`, "success");
+            } else {
+                showResult("密码错误，请重新输入。", "error");
+                // 清空密码框
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = type;
+            resultDiv.innerHTML = message;
+            resultDiv.classList.remove('hidden');
+        }
+
+        // 支持按回车键查询
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                handleSearch();
+            }
+        });
+
+        // 页面加载时隐藏密码输入框
+        document.getElementById('passwordGroup').style.display = 'none';
+    </script>
+</body>
+</html>
